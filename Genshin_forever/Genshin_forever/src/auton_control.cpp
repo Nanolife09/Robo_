@@ -126,10 +126,16 @@ void forward_and_intake(float rotation) {
     if (power > 100) {
       power = 100;
     }
+    if (leftfront.rotation(rotationUnits::raw) <= rotation) {
+      leftfront.stop();
+      leftback.stop();
+    }
+    else {
+      leftfront.spin(directionType::fwd, power, velocityUnits::pct);
+      leftback.spin(directionType::fwd, power, velocityUnits::pct);
+    }
     rightfront.spin(directionType::fwd, power, velocityUnits::pct);
     rightback.spin(directionType::fwd, power, velocityUnits::pct);
-    leftfront.spin(directionType::fwd, power, velocityUnits::pct);
-    leftback.spin(directionType::fwd, power, velocityUnits::pct);
     v_intake_bottom.spin(directionType::fwd, 100, velocityUnits::pct);
     h_intake_r.spin(directionType::fwd, 100, velocityUnits::pct);
     h_intake_l.spin(directionType::fwd, 100, velocityUnits::pct);
