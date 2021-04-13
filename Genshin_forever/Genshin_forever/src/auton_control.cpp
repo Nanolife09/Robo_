@@ -4,53 +4,7 @@
 
 const float fb_constant = 0.1;
 const float t_constant = 0;
-const float other_constant = 0;
 float power = 0;
-
-void rotate (motor name, float rotation) {
-  while (name.rotation(rotationUnits::raw) < rotation) {
-    float power = (rotation - name.rotation(rotationUnits::raw)) * other_constant;
-    if (power > 100) {
-      power = 100;
-    }
-    name.spin(directionType::fwd, power, velocityUnits::pct);
-  }
-  name.stop();
-}
-
-void forward(float rotation) {
-  while (rightfront.rotation(rotationUnits::raw) < rotation) {
-    power = (rotation - rightfront.rotation(rotationUnits::raw)) * fb_constant;
-    if (power > 100) {
-      power = 100;
-    }
-    rightfront.spin(directionType::fwd, power, velocityUnits::pct);
-    rightback.spin(directionType::fwd, power, velocityUnits::pct);
-    leftfront.spin(directionType::fwd, power, velocityUnits::pct);
-    leftback.spin(directionType::fwd, power, velocityUnits::pct);
-  }
-  rightfront.stop();
-  rightback.stop();
-  leftfront.stop();
-  leftback.stop();
-}
-
-void backward (float rotation) {
-  while (rightfront.rotation(rotationUnits::raw) > rotation) {
-    power = (rotation - rightfront.rotation(rotationUnits::raw)) * fb_constant;
-    if (power > 100) {
-      power = 100;
-    }
-    rightfront.spin(directionType::fwd, power, velocityUnits::pct);
-    rightback.spin(directionType::fwd, power, velocityUnits::pct);
-    leftfront.spin(directionType::fwd, power, velocityUnits::pct);
-    leftback.spin(directionType::fwd, power, velocityUnits::pct);
-  }
-  rightfront.stop();
-  rightback.stop();
-  leftfront.stop();
-  leftback.stop();
-}
 
 void intake(int time) {
   v_intake_bottom.spin(directionType::fwd, 100, velocityUnits::pct);
