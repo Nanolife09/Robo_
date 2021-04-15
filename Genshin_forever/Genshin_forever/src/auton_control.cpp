@@ -1,172 +1,121 @@
 #include "vex.h"
 #include "pragma.h"
+#include "driver_control.h"
 #include "auton_control.h"
+#include <vector>
+#include <chrono>
+#include <iostream>
 
-const float fb_constant = 0.1;
-const float t_constant = 0;
-float power = 0;
+float constant = 0.001;
 
-void intake(int time) {
-  v_intake_bottom.spin(directionType::fwd, 100, velocityUnits::pct);
-  h_intake_r.spin(directionType::fwd, 100, velocityUnits::pct);
-  h_intake_l.spin(directionType::fwd, 100, velocityUnits::pct);
-  task::sleep(time);
-  v_intake_bottom.stop();
-  h_intake_r.stop();
-  h_intake_l.stop();
-}
-
-void outtake(int time) { 
-  v_intake_top.spin(directionType::fwd, 100, velocityUnits::pct);
-  task::sleep(time);
-  v_intake_top.stop();
-}
-
-void v_intake_only (int time) {
-  v_intake_bottom.spin(directionType::fwd, 100, velocityUnits::pct);
-  v_intake_top.spin(directionType::fwd, 100, velocityUnits::pct);
-  task::sleep(time);
-}
-
-void full_cycle(int time) {
-  v_intake_top.spin(directionType::fwd, 100, velocityUnits::pct);
-  v_intake_bottom.spin(directionType::fwd, 100, velocityUnits::pct);
-  h_intake_r.spin(directionType::fwd, 100, velocityUnits::pct);
-  h_intake_l.spin(directionType::fwd, 100, velocityUnits::pct);
-  task::sleep(time);
-  v_intake_top.stop();
-  v_intake_bottom.stop();
-  h_intake_r.stop();
-  h_intake_l.stop();
-}
-
-void right(float rotation) {
-  while (rightfront.rotation(rotationUnits::raw) < rotation) {
-    power = (rotation - rightfront.rotation(rotationUnits::raw)) * t_constant;
-    if (power > 100) {
-      power = 100;
+void right_movement (float target, bool intake = true) {
+  if (target > 0) {
+    while (rightfront.rotation(rotationUnits::raw) < target) {
+      float power = target - rightfront.rotation(rotationUnits::raw);
+      if (power >= 100) {
+        power = 100;
+      }
+      else if (power <= -100) {
+        power = -100;
+      }
+      spin(rightfront, power * constant);
+      spin(rightback, power * constant);
+      if (intake) {
+        spin(h_intake_r);
+        spin(h_intake_l);
+        spin(v_intake_bottom);
+      }
     }
-    rightfront.spin(directionType::fwd, power, velocityUnits::pct);
-    rightback.spin(directionType::fwd, power, velocityUnits::pct);
-    leftfront.spin(directionType::fwd, -power, velocityUnits::pct);
-    leftback.spin(directionType::fwd, -power, velocityUnits::pct);
+  }
+  else {
+    while (rightfront.rotation(rotationUnits::raw) > target) {
+      float power = target + rightfront.rotation(rotationUnits::raw);
+      if (power >= 100) {
+        power = 100;
+      }
+      else if (power <= -100) {
+        power = -100;
+      }
+      spin(rightfront, power * constant);
+      spin(rightback, power * constant);
+      if (intake) {
+        spin(h_intake_r);
+        spin(h_intake_l);
+        spin(v_intake_bottom);
+      }
+    }
   }
   rightfront.stop();
   rightback.stop();
-  leftfront.stop();
-  leftback.stop();
-}
-
-void left(float rotation) {
-  while (leftfront.rotation(rotationUnits::raw) > rotation) {
-    power = (rotation - rightfront.rotation(rotationUnits::raw)) * t_constant;
-    if (power > 100) {
-      power = 100;
-    }
-    rightfront.spin(directionType::fwd, -power, velocityUnits::pct);
-    rightback.spin(directionType::fwd, -power, velocityUnits::pct);
-    leftfront.spin(directionType::fwd, power, velocityUnits::pct);
-    leftback.spin(directionType::fwd, power, velocityUnits::pct);
+  if (intake) {
+    h_intake_r.stop();
+    h_intake_l.stop();
+    v_intake_bottom.stop();
   }
-  rightfront.stop();
-  rightback.stop();
-  leftfront.stop();
-  leftback.stop();
 }
 
-void forward_and_intake(float rotation) {
-  while (rightfront.rotation(rotationUnits::raw) < rotation) {
-    power = (rotation - rightfront.rotation(rotationUnits::raw)) * fb_constant;
-    if (power > 100) {
-      power = 100;
+void left_movement (float target, bool intake = true) {
+  if (target > 0) {
+    while (leftfront.rotation(rotationUnits::raw) < target) {
+      float power = target - leftfront.rotation(rotationUnits::raw);
+      if (power >= 100) {
+        power = 100;
+      }
+      else if (power <= -100) {
+        power = -100;
+      }
+      spin(leftfront, power * constant);
+      spin(leftback, power * constant);
+      if (intake) {
+        spin(h_intake_r);
+        spin(h_intake_l);
+        spin(v_intake_bottom);
+      }
     }
-    if (leftfront.rotation(rotationUnits::raw) <= rotation) {
-      leftfront.stop();
-      leftback.stop();
-    }
-    else {
-      leftfront.spin(directionType::fwd, power, velocityUnits::pct);
-      leftback.spin(directionType::fwd, power, velocityUnits::pct);
-    }
-    rightfront.spin(directionType::fwd, power, velocityUnits::pct);
-    rightback.spin(directionType::fwd, power, velocityUnits::pct);
-    v_intake_bottom.spin(directionType::fwd, 100, velocityUnits::pct);
-    h_intake_r.spin(directionType::fwd, 100, velocityUnits::pct);
-    h_intake_l.spin(directionType::fwd, 100, velocityUnits::pct);
   }
-  rightfront.stop();
-  rightback.stop();
+  else {
+    while (leftfront.rotation(rotationUnits::raw) > target) {
+      float power = target + leftfront.rotation(rotationUnits::raw);
+      if (power >= 100) {
+        power = 100;
+      }
+      else if (power <= -100) {
+        power = -100;
+      }
+      spin(leftfront, power * constant);
+      spin(leftback, power * constant);
+      if (intake) {
+        spin(h_intake_r);
+        spin(h_intake_l);
+        spin(v_intake_bottom);
+      }
+    }
+  }
   leftfront.stop();
   leftback.stop();
-  v_intake_bottom.stop();
-  h_intake_r.stop();
-  h_intake_l.stop();
+  if (intake) {
+    h_intake_r.stop();
+    h_intake_l.stop();
+    v_intake_bottom.stop();
+  }
 }
 
+std::vector <std::vector<float>> route;
+std::vector <bool> intake_permission;
 
-void pre_auton() {
-  
+void test () {
+  std::cout << "running...";
 }
 
 void Hutao_skill() {
-  forward_and_intake(1000);
-  /* red
-    forward_and_intake(rotation);
-    left(rotation);
-    forward_and_intake(rotation);
-    left(rotaion);
-    forward_and_intake(rotation);
-    full_cycle(time);
-  */
-  /* orange
-    backward(rotation);
-    outtake(time);
-    left(rotation);
-    forward_and_intake(rotation);
-    left(rotation);
-    forward_and_intake(rotation);
-    full_cycle(time);
-  */
-  /* yellow
-    backward(rotation);
-    right(rotation);
-    forward_and_intake(rotation);
-    left(rotation);
-    forward_and_intake(rotation);
-    full_cycle(time);
-  */
-  /* lime
-    backward(rotation);
-    full_cycle(time);
-    right(rotation);
-    forward_and_intake(rotation);
-    left(rotation);
-    forward_and_intake(rotation);
-    full_cycle(time);
-  */
-  /* light blue
-    backward(rotation);
-    full_cycle(time);
-    left(rotation);
-    forward_and_intake(rotation);
-    full_cycle(time);
-  */
-  /* blue
-    backward(rotation);
-    full_cycle(time);
-    right(rotation);
-    forward_and_intake(rotation);
-    full_cycle(time);
-  */
-  /* purple
-    backward(rotation);
-    full_cycle(time);
-    right(rotation);
-    forward_and_intake(rotation);
-    right(rotation);
-
-  */
-  /*`light grey
-
-  */
-}
+  std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+  thread t1 ([]{test();});
+  thread t2 ([]{test();});
+  t1.join();
+  t2.join();
+  std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+  //test();
+  //test();
+  std::chrono::seconds total_time = std::chrono::duration_cast<std::chrono::seconds>(end - begin);
+  std::cout << "time: " << total_time.count();
+} 
