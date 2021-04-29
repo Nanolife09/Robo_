@@ -15,6 +15,11 @@ extern double c_multiplier;
 int c_equation (int axis_input);
 void c_mapping_initialize();
 
+extern float A1;
+extern float A2;
+extern float A3;
+extern float A4;
+
 extern void spin (motor name, int power = 100);
 
 extern void tank_control();
