@@ -7,115 +7,58 @@
 #include <iostream>
 
 float constant = 0.001;
+float power;
 
-void right_movement (float target, bool intake = true) {
-  if (target > 0) {
-    while (rightfront.rotation(rotationUnits::raw) < target) {
-      float power = target - rightfront.rotation(rotationUnits::raw);
-      if (power >= 100) {
-        power = 100;
-      }
-      else if (power <= -100) {
-        power = -100;
-      }
-      spin(rightfront, power * constant);
-      spin(rightback, power * constant);
-      if (intake) {
-        spin(h_intake_r);
-        spin(h_intake_l);
-        spin(v_intake_bottom);
-      }
+void forward_ (float rotate) {
+  while (rightfront.rotation(rotationUnits::raw) < rotate) {
+    power = rotate - rightfront.rotation(rotationUnits::raw);
+    if (power >= 100) {
+      power = 100;
     }
+    rightfront.spin(directionType::fwd, power, velocityUnits::pct);
+    rightback.spin(directionType::fwd, power, velocityUnits::pct);
+    leftfront.spin(directionType::fwd, power, velocityUnits::pct);
+    leftback.spin(directionType::fwd, power, velocityUnits::pct);
+    h_intake_r.spin(directionType::fwd, 100, velocityUnits::pct);
+    h_intake_l.spin(directionType::fwd, 100, velocityUnits::pct);
+    v_intake_bottom.spin(directionType::fwd, 100, velocityUnits::pct);
   }
-  else {
-    while (rightfront.rotation(rotationUnits::raw) > target) {
-      float power = target + rightfront.rotation(rotationUnits::raw);
-      if (power >= 100) {
-        power = 100;
-      }
-      else if (power <= -100) {
-        power = -100;
-      }
-      spin(rightfront, power * constant);
-      spin(rightback, power * constant);
-      if (intake) {
-        spin(h_intake_r);
-        spin(h_intake_l);
-        spin(v_intake_bottom);
-      }
-    }
-  }
-  rightfront.stop();
-  rightback.stop();
-  if (intake) {
-    h_intake_r.stop();
-    h_intake_l.stop();
-    v_intake_bottom.stop();
-  }
+  h_intake_r.stop();
+  h_intake_l.stop();
+  v_intake_bottom.stop();
+  rightfront.rotateTo(rotate, rotationUnits::raw);
+  rightback.rotateTo(rotate, rotationUnits::raw);
+  leftfront.rotateTo(rotate, rotationUnits::raw);
+  leftback.rotateTo(rotate, rotationUnits::raw);
 }
 
-void left_movement (float target, bool intake = true) {
-  if (target > 0) {
-    while (leftfront.rotation(rotationUnits::raw) < target) {
-      float power = target - leftfront.rotation(rotationUnits::raw);
-      if (power >= 100) {
-        power = 100;
-      }
-      else if (power <= -100) {
-        power = -100;
-      }
-      spin(leftfront, power * constant);
-      spin(leftback, power * constant);
-      if (intake) {
-        spin(h_intake_r);
-        spin(h_intake_l);
-        spin(v_intake_bottom);
-      }
+void backward_ (float rotate) {
+  while (rightfront.rotation(rotationUnits::raw) < rotate) {
+    power = rotate - rightfront.rotation(rotationUnits::raw);
+    if (power <= -100) {
+      power = -100;
     }
+    rightfront.spin(directionType::fwd, power, velocityUnits::pct);
+    rightback.spin(directionType::fwd, power, velocityUnits::pct);
+    leftfront.spin(directionType::fwd, power, velocityUnits::pct);
+    leftback.spin(directionType::fwd, power, velocityUnits::pct);
   }
-  else {
-    while (leftfront.rotation(rotationUnits::raw) > target) {
-      float power = target + leftfront.rotation(rotationUnits::raw);
-      if (power >= 100) {
-        power = 100;
-      }
-      else if (power <= -100) {
-        power = -100;
-      }
-      spin(leftfront, power * constant);
-      spin(leftback, power * constant);
-      if (intake) {
-        spin(h_intake_r);
-        spin(h_intake_l);
-        spin(v_intake_bottom);
-      }
-    }
-  }
-  leftfront.stop();
-  leftback.stop();
-  if (intake) {
-    h_intake_r.stop();
-    h_intake_l.stop();
-    v_intake_bottom.stop();
-  }
+  rightfront.rotateTo(rotate, rotationUnits::raw);
+  rightback.rotateTo(rotate, rotationUnits::raw);
+  leftfront.rotateTo(rotate, rotationUnits::raw);
+  leftback.rotateTo(rotate, rotationUnits::raw);
 }
 
-std::vector <std::vector<float>> route;
-std::vector <bool> intake_permission;
-
-void test () {
-  std::cout << "running...";
+void full_cycle (int time) {
+  h_intake_r.spin(directionType::fwd, 100, velocityUnits::pct);
+  h_intake_l.spin(directionType::fwd, 100, velocityUnits::pct);
+  v_intake_top.spin(directionType::fwd, 100, velocityUnits::pct);
+  v_intake_bottom.spin(directionType::fwd, 100, velocityUnits::pct);
+  task::sleep(time);
 }
 
 void Hutao_skill() {
-  std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
-  thread t1 ([]{test();});
-  thread t2 ([]{test();});
-  t1.join();
-  t2.join();
-  std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-  //test();
-  //test();
-  std::chrono::seconds total_time = std::chrono::duration_cast<std::chrono::seconds>(end - begin);
-  std::cout << "time: " << total_time.count();
+  forward_(1000);
+  full_cycle(1000);
+  backward_(1000);
 } 

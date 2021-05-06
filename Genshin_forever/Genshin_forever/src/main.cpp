@@ -10,7 +10,7 @@ competition Competition;
 void user_control() {
   while (true) {
     tank_control();
-    intake_control();
+    intake_v_2();
     slow_mode_();
   }
 }
@@ -21,9 +21,7 @@ int main() {
   Competition.drivercontrol(user_control);
   Competition.autonomous(Hutao_skill);
   while (true) {
-    Brain.Screen.clearScreen();
     button_update();
-    visual_update();
     visual_print();
     task::sleep(20);
   }

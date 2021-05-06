@@ -8,7 +8,9 @@ extern void spin (motor name, int power = 100);
 
 extern void tank_control();
 
-extern void intake_control();
+extern void intake_v_1();
+
+extern void intake_v_2();
 
 extern void user_control();
 

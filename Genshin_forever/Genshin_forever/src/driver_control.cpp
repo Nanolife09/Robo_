@@ -13,6 +13,7 @@ bool R1 = (ctrl.ButtonR1.pressing()) ? true : false;
 bool R2 = (ctrl.ButtonR2.pressing()) ? true : false;
 bool L1 = (ctrl.ButtonL1.pressing()) ? true : false;
 bool L2 = (ctrl.ButtonL2.pressing()) ? true : false;
+bool UP = (ctrl.ButtonUp.pressing()) ? true : false;
 
 void spin (motor name, int power) {
   name.spin(directionType::fwd, power, velocityUnits::pct);
@@ -25,7 +26,7 @@ void tank_control() {
   spin(rightback, A2 * slow_mode);
 }
 
-void intake_control() {
+void intake_v_1() {
   if (R1) {
     spin(h_intake_r);
     spin(h_intake_l);
@@ -49,6 +50,39 @@ void intake_control() {
   }
 }
 
+void intake_v_2() {
+  if (R1) {
+    spin(h_intake_r);
+    spin(h_intake_l);
+  }
+  if (R2) {
+    spin(v_intake_top);
+    spin(v_intake_bottom);
+  }
+  if (L1) {
+    spin(h_intake_r, -100);
+    spin(h_intake_l, -100);
+  }
+  if (L2) {
+    spin(v_intake_bottom, -100);
+  }
+  if (UP) {
+    spin(v_intake_top, -100);
+  }
+  if (!R1 && !L1) {
+    h_intake_r.stop();
+    h_intake_l.stop();
+  }
+  if (!R2) {
+    if (!L2) {
+      v_intake_bottom.stop();
+    }
+    if (!UP) {
+      v_intake_top.stop();
+    }
+  }
+}
+
 void slow_mode_ () {
   if (L1) {
     slow_mode = 0.7;
@@ -67,4 +101,5 @@ void button_update() {
   R2 = (ctrl.ButtonR2.pressing()) ? true : false;
   L1 = (ctrl.ButtonL1.pressing()) ? true : false;
   L2 = (ctrl.ButtonL2.pressing()) ? true : false;
+  UP = (ctrl.ButtonUp.pressing()) ? true : false;
 }
