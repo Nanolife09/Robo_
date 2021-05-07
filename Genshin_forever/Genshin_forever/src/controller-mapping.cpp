@@ -2,7 +2,7 @@
 
 // curve mapping constants
 bool curve_is_on = 1; // on and off for curved controller mapping
-double c_exponent = 2.5;
+double c_exponent = 2.0;
 int c_lower_dz = 10; // lower dead zone; dead zone being the part of the joystick range that has no effect
 int c_upper_dz = 10; // upper dead zone
 int c_lowest_pwr = 3; // lowest power output

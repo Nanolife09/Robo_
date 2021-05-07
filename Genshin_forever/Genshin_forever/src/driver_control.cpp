@@ -1,5 +1,5 @@
 #include "driver_control.h"
-#include "controller-mapping.cpp"
+#include "controller-mapping.h"
 
 controller ctrl;
 
@@ -15,6 +15,7 @@ bool R2 = (ctrl.ButtonR2.pressing()) ? true : false;
 bool L1 = (ctrl.ButtonL1.pressing()) ? true : false;
 bool L2 = (ctrl.ButtonL2.pressing()) ? true : false;
 bool UP = (ctrl.ButtonUp.pressing()) ? true : false;
+bool DOWN = (ctrl.ButtonDown.pressing()) ? true : false;
 
 void spin (motor name, int power) {
   name.spin(directionType::fwd, power, velocityUnits::pct);
@@ -37,6 +38,7 @@ void intake_v_1() {
     spin(h_intake_r, -100);
     spin(h_intake_l, -100);
     spin(v_intake_bottom, -100);
+    // spin(v_intake_top, -100);
   }
   else {
     v_intake_bottom.stop();
@@ -66,6 +68,7 @@ void intake_v_2() {
   }
   if (L2) {
     spin(v_intake_bottom, -100);
+    spin(v_intake_top, -100);
   }
   if (UP) {
     spin(v_intake_top, -100);
@@ -85,7 +88,7 @@ void intake_v_2() {
 }
 
 void slow_mode_ () {
-  if (L1) {
+  if (DOWN) {
     slow_mode = 0.7;
   }
   else {
@@ -103,4 +106,5 @@ void button_update() {
   L1 = (ctrl.ButtonL1.pressing()) ? true : false;
   L2 = (ctrl.ButtonL2.pressing()) ? true : false;
   UP = (ctrl.ButtonUp.pressing()) ? true : false;
+  DOWN = (ctrl.ButtonDown.pressing()) ? true : false;
 }

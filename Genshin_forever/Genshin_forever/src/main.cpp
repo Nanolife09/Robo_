@@ -2,7 +2,7 @@
 #include "driver_control.h"
 #include "auton_control.h"
 #include "visual.h"
-#include "controller-mapping.cpp"
+#include "controller-mapping.h"
 
 using namespace vex;
 
@@ -17,8 +17,6 @@ void user_control() {
     tank_control();
     intake_v_2();
     slow_mode_();
-
-    std::cout << A3 << std::endl;
   }
 }
 
