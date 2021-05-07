@@ -2,21 +2,16 @@
 #include "driver_control.h"
 #include "auton_control.h"
 #include "visual.h"
+#include "controller-mapping.cpp"
 
 using namespace vex;
 
 competition Competition;
 
 void user_control() {
-  int graph[255];
+  c_mapping_initialize();
 
-  for (int i = 0; i < 255; i++) {
-    graph[i] = c_equation(i - 127);
-  }
-
-  for (int i = 0; i < 255; i++) {
-    std::cout << (i - 127) << " " << graph[i] << std::endl;
-  }
+  c_mapping_print_map();
 
   while (true) {
     tank_control();
